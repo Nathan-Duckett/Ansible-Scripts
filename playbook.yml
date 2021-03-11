@@ -2,3 +2,4 @@
   hosts: server
   roles:
     - ./roles/htop
+    - ./roles/python3.8
