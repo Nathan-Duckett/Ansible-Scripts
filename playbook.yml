@@ -1,0 +1,4 @@
+- name: Server Deployment
+  hosts: server
+  roles:
+    - ./roles/htop

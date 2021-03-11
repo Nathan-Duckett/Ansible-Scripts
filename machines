@@ -1,0 +1,6 @@
+[server]
+ndser.page
+
+[server:vars]
+ansible_connect=ssh
+ansible_ssh_user=nathan
