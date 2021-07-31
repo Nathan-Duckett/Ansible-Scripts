@@ -5,7 +5,7 @@
 
 - name: Check if fzf is latest version
   meta: end_play
-  when: CURRENT_FZF_VERSION.stdout != "" or CURRENT_FZF_VERSION.stdout is version(EXPECTED_FZF_VERSION,'>=')
+  when: CURRENT_FZF_VERSION != "" or CURRENT_FZF_VERSION.stdout is version(EXPECTED_FZF_VERSION,'>=')
 
 - name: Download fzf version {{ EXPECTED_FZF_VERSION }}
   shell: wget https://github.com/junegunn/fzf/releases/download/{{ EXPECTED_FZF_VERSION }}/fzf-{{ EXPECTED_FZF_VERSION }}-linux_amd64.tar.gz
