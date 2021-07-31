@@ -1,0 +1,32 @@
+- name: Check docker installation status
+  stat:
+    path: "{{ DEFAULT_TOOL_LOCATION }}/docker"
+  register: DOCKER_INSTALLATION_STATUS
+
+- name: Check docker version
+  shell: docker --version | cut -d',' -f1 | cut -d' ' -f3
+  register: CURRENT_DOCKER_VERSION
+  changed_when: false
+  when: DOCKER_INSTALLATION_STATUS.stat.exists
+
+- name: Skipping if docker is latest version
+  meta: end_play
+  when: DOCKER_INSTALLATION_STATUS.stat.exists and CURRENT_DOCKER_VERSION.stdout is version(EXPECTED_DOCKER_VERSION,'>=')
+
+- name: Download and install latest docker
+  unarchive:
+    src: https://download.docker.com/linux/static/stable/x86_64/docker-{{ EXPECTED_DOCKER_VERSION }}.tgz 
+    dest: "{{ DEFAULT_TOOL_LOCATION }}"
+    remote_src: yes
+  become: yes
+
+- name: Start docker installation
+  shell: dockerd &
+  become: yes
+
+- name: Add "{{ ansible_ssh_user }}" to docker group if required
+  user:
+    name: "{{ ansible_ssh_user }}"
+    groups: docker
+    append: yes
+  become: yes
