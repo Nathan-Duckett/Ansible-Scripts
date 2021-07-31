@@ -1,20 +1,22 @@
+- name: Check fzf installation status
+  stat:
+    path: "{{ DEFAULT_TOOL_LOCATION }}/fzf"
+  register: FZF_INSTALLATION_STATUS
+
 - name: Check fzf version
   shell: fzf --version | cut -d' ' -f1
   register: CURRENT_FZF_VERSION
   changed_when: false
+  when: FZF_INSTALLATION_STATUS.stat.exists
 
-- name: Check if fzf is latest version
+- name: Skipping if fzf is latest version
   meta: end_play
-  when: CURRENT_FZF_VERSION != "" or CURRENT_FZF_VERSION.stdout is version(EXPECTED_FZF_VERSION,'>=')
+  when: FZF_INSTALLATION_STATUS.stat.exists and CURRENT_FZF_VERSION.stdout is version(EXPECTED_FZF_VERSION,'>=')
 
-- name: Download fzf version {{ EXPECTED_FZF_VERSION }}
-  shell: wget https://github.com/junegunn/fzf/releases/download/{{ EXPECTED_FZF_VERSION }}/fzf-{{ EXPECTED_FZF_VERSION }}-linux_amd64.tar.gz
+- name: Download and install latest fzf
+  unarchive:
+    src: https://github.com/junegunn/fzf/releases/download/{{ EXPECTED_FZF_VERSION }}/fzf-{{ EXPECTED_FZF_VERSION }}-linux_amd64.tar.gz 
+    dest: "{{ DEFAULT_TOOL_LOCATION }}"
+    remote_src: yes
+  become: yes
 
-- name: Untar fzf installation
-  shell: tar -xvf fzf-{{ EXPECTED_FZF_VERSION }}-linux_amd64.tar.gz
-
-- name: Copy fzf to {{ DEFAULT_TOOL_LOCATION }}
-  shell: sudo cp fzf {{ DEFAULT_TOOL_LOCATION }}/fzf
-
-- name: Cleanup downloaded fzf files
-  shell: rm -f fzf fzf-{{ EXPECTED_FZF_VERSION }}-linux_amd64.tar.gz
