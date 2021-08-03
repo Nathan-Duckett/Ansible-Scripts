@@ -4,3 +4,7 @@
     - ./roles/htop
     - ./roles/python3.8
     - ./roles/fzf
+- name: Local Configuration
+  hosts: local
+  roles:
+    - ./roles/htop
